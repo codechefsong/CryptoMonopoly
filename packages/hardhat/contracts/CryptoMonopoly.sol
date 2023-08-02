@@ -11,6 +11,7 @@ contract CryptoMonopoly {
         uint256 id;
         string typeGrid;
         address owner;
+        address player;
     }
 
     event RollResult(address player, uint256 num);
@@ -21,7 +22,7 @@ contract CryptoMonopoly {
         owner = _owner;
 
         for (uint256 id = 0; id < 20; id++) {
-            grid.push(Box(id, "empty", address(0)));
+            grid.push(Box(id, "empty", address(0), address(0)));
         }
     }
 
@@ -29,15 +30,24 @@ contract CryptoMonopoly {
         return grid;
     }
 
+    function addPlayer() public {
+        grid[0].player = msg.sender;
+    }
+
     function movePlayer() public {
-      uint256 randomNumber = uint256(keccak256(abi.encode(block.timestamp, msg.sender))) % 5;
-      player[msg.sender] += randomNumber + 1;
+        grid[player[msg.sender]].player = address(0);
 
-      if (player[msg.sender] >= 20) {
-        player[msg.sender] = 0;
-      }
+        uint256 randomNumber = uint256(keccak256(abi.encode(block.timestamp, msg.sender))) % 5;
+        player[msg.sender] += randomNumber + 1;
 
-      emit RollResult(msg.sender, randomNumber);
+        if (player[msg.sender] >= 20) {
+            player[msg.sender] = 0;
+            grid[0].player = msg.sender;
+        }
+
+        grid[player[msg.sender]].player = msg.sender;
+
+        emit RollResult(msg.sender, randomNumber);
     }
 
     modifier isOwner() {
