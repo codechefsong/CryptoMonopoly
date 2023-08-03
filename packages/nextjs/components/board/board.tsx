@@ -1,5 +1,6 @@
 import { useAccount } from "wagmi";
 import { useScaffoldContractRead, useScaffoldContractWrite } from "~~/hooks/scaffold-eth";
+import { BOARD_STYLES } from "./style";
 
 export const Board = () => {
   const { address } = useAccount()
@@ -36,11 +37,11 @@ export const Board = () => {
             <button className="py-2 px-16 mb-1 mt-3 mr-3 bg-green-500 rounded baseline hover:bg-green-300 disabled:opacity-50" onClick={() => roll()}>
               Roll
             </button>
-            <div className="flex flex-wrap" style={{ width: "450px"}}>
+            <div className="relative mt-3" style={{ width: "450px", height: "600px"}}>
               {gridData && gridData.map((item, index) => (
                <div
                   key={index}
-                  className="w-20 h-20 border border-gray-300 flex items-center justify-center font-bold relative bg-white"
+                  className={"w-20 h-20 border border-gray-300 font-bold bg-white" + " " + BOARD_STYLES[index] || "grid-1"}
                 >
                   {item.player === address && "You"}
                 </div>
