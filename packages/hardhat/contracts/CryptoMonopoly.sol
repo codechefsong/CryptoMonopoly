@@ -1,7 +1,11 @@
 //SPDX-License-Identifier: MIT
 pragma solidity >=0.8.0 <0.9.0;
 
+import "./CoinToken.sol";
+
 contract CryptoMonopoly {
+    CoinToken public coin;
+
     // State Variables
     address public immutable owner;
     Box[] public grid;
@@ -18,8 +22,9 @@ contract CryptoMonopoly {
 
     // Constructor: Called once on contract deployment
     // Check packages/hardhat/deploy/00_deploy_your_contract.ts
-    constructor(address _owner) {
+    constructor(address _owner, address tokenAddress) {
         owner = _owner;
+        coin = CoinToken(tokenAddress);
 
         for (uint256 id = 0; id < 20; id++) {
             grid.push(Box(id, "empty", address(0), address(0)));
@@ -32,6 +37,7 @@ contract CryptoMonopoly {
 
     function addPlayer() public {
         grid[0].player = msg.sender;
+        coin.mint(msg.sender, 100 * 10 ** 18);
     }
 
     function movePlayer() public {

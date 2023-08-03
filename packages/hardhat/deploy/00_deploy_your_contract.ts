@@ -1,5 +1,6 @@
 import { HardhatRuntimeEnvironment } from "hardhat/types";
 import { DeployFunction } from "hardhat-deploy/types";
+import { ethers } from "hardhat";
 
 /**
  * Deploys a contract named "YourContract" using the deployer account and
@@ -21,10 +22,17 @@ const deployYourContract: DeployFunction = async function (hre: HardhatRuntimeEn
   const { deployer } = await hre.getNamedAccounts();
   const { deploy } = hre.deployments;
 
+  await deploy("CoinToken", {
+    from: deployer,
+    log: true,
+  });
+
+  const coinToken = await ethers.getContract("CoinToken", deployer);
+
   await deploy("CryptoMonopoly", {
     from: deployer,
     // Contract constructor arguments
-    args: [deployer],
+    args: [deployer, coinToken.address],
     log: true,
     // autoMine: can be passed to the deploy function to make the deployment process faster on local networks by
     // automatically mining the contract deployment transaction. There is no effect on live networks.
