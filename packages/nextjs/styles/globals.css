@@ -150,3 +150,10 @@ p {
   top: 90px;
   left: 0;
 }
+
+.grid-action {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-40%, -80%);
+}

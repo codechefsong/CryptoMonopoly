@@ -16,6 +16,7 @@ contract CryptoMonopoly {
         string typeGrid;
         address owner;
         address player;
+        uint256 price;
     }
 
     event RollResult(address player, uint256 num);
@@ -26,8 +27,10 @@ contract CryptoMonopoly {
         owner = _owner;
         coin = CoinToken(tokenAddress);
 
+        uint256 count = 1;
         for (uint256 id = 0; id < 20; id++) {
-            grid.push(Box(id, "empty", address(0), address(0)));
+            grid.push(Box(id, "empty", address(0), address(0), count * 5 * 10 ** 18));
+            count += 1;
         }
     }
 
@@ -55,6 +58,16 @@ contract CryptoMonopoly {
 
         emit RollResult(msg.sender, randomNumber);
     }
+
+    function buyProperty() public {
+        Box memory currentSpot = grid[player[msg.sender]];
+        
+        require(coin.balanceOf(msg.sender) >= currentSpot.price);
+
+        coin.burn(msg.sender, currentSpot.price);
+        grid[player[msg.sender]].owner = msg.sender;
+    }
+
 
     modifier isOwner() {
         require(msg.sender == owner, "Not the Owner");
