@@ -9,6 +9,12 @@ export const Board = () => {
     functionName: "getGrid",
   });
 
+  const { data: you } = useScaffoldContractRead({
+    contractName: "CryptoMonopoly",
+    functionName: "player",
+    args: [address],
+  });
+
   const { data: coinBalance } = useScaffoldContractRead({
     contractName: "CoinToken",
     functionName: "balanceOf",
@@ -77,14 +83,15 @@ export const Board = () => {
                       "w-20 h-20 border border-gray-300 font-bold bg-white" + " " + BOARD_STYLES[index] || "grid-1"
                     }
                   >
-                    {item.player === address
-                      ? "You"
-                      : item.player !== "0x0000000000000000000000000000000000000000" && item.player.slice(37, 42)}
-                    <p>
-                      {item.owner !== "0x0000000000000000000000000000000000000000"
-                        ? "H"
-                        : (item?.price?.toString() as any) / 10 ** 18}
-                    </p>
+                    {you?.toString() === item.id.toString() && <p className="my-0">You</p>}
+                    <div className="flex my-0">
+                      {item.numberOfPlayers > 0 && <p className="mr-1"># {item.numberOfPlayers.toString()} | </p>}
+                      <p>
+                        {item.owner !== "0x0000000000000000000000000000000000000000"
+                          ? "H"
+                          : (item?.price?.toString() as any) / 10 ** 18}
+                      </p>
+                    </div>
                   </div>
                 ))}
             </div>

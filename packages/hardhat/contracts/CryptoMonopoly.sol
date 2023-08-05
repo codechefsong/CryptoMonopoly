@@ -15,7 +15,7 @@ contract CryptoMonopoly {
         uint256 id;
         string typeGrid;
         address owner;
-        address player;
+        uint256 numberOfPlayers;
         uint256 price;
     }
 
@@ -29,7 +29,7 @@ contract CryptoMonopoly {
 
         uint256 count = 1;
         for (uint256 id = 0; id < 20; id++) {
-            grid.push(Box(id, "empty", address(0), address(0), count * 5 * 10 ** 18));
+            grid.push(Box(id, "empty", address(0), 0, count * 5 * 10 ** 18));
             count += 1;
         }
     }
@@ -39,22 +39,23 @@ contract CryptoMonopoly {
     }
 
     function addPlayer() public {
-        grid[0].player = msg.sender;
+        grid[0].numberOfPlayers += 1;
         coin.mint(msg.sender, 100 * 10 ** 18);
     }
 
     function movePlayer() public {
-        grid[player[msg.sender]].player = address(0);
+        grid[player[msg.sender]].numberOfPlayers -= 1;
 
         uint256 randomNumber = uint256(keccak256(abi.encode(block.timestamp, msg.sender))) % 5;
         player[msg.sender] += randomNumber + 1;
 
         if (player[msg.sender] >= 20) {
             player[msg.sender] = 0;
-            grid[0].player = msg.sender;
+            grid[0].numberOfPlayers += 1;
         }
-
-        grid[player[msg.sender]].player = msg.sender;
+        else {
+            grid[player[msg.sender]].numberOfPlayers += 1;
+        }
 
         emit RollResult(msg.sender, randomNumber);
     }
