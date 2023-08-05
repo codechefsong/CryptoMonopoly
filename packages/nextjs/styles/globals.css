@@ -151,6 +151,12 @@ p {
   left: 0;
 }
 
+.grid-21 {
+  position: absolute;
+  top: 0;
+  left: 540px;
+}
+
 .grid-action {
   position: absolute;
   top: 50%;

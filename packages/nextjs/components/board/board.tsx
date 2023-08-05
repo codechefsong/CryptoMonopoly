@@ -45,6 +45,14 @@ export const Board = () => {
     },
   });
 
+  const { writeAsync: leaveJail } = useScaffoldContractWrite({
+    contractName: "CryptoMonopoly",
+    functionName: "leaveJail",
+    onBlockConfirmation: txnReceipt => {
+      console.log("📦 Transaction blockHash", txnReceipt.blockHash);
+    },
+  });
+
   return (
     <div className="mt-5">
       <div>
@@ -74,6 +82,12 @@ export const Board = () => {
                 >
                   Buy Property
                 </button>
+                <button
+                  className="py-2 px-16 mb-1 mt-3 mr-3 bg-green-500 rounded baseline hover:bg-green-300 disabled:opacity-50"
+                  onClick={() => leaveJail()}
+                >
+                  Leave Jail
+                </button>
               </div>
               {gridData &&
                 gridData.map((item, index) => (
@@ -89,7 +103,9 @@ export const Board = () => {
                       <p>
                         {item.owner !== "0x0000000000000000000000000000000000000000"
                           ? "H"
-                          : (item?.price?.toString() as any) / 10 ** 18}
+                          : item.typeGrid === "Building"
+                          ? (item?.price?.toString() as any) / 10 ** 18
+                          : item.typeGrid}
                       </p>
                     </div>
                   </div>

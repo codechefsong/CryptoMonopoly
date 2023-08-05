@@ -28,9 +28,15 @@ contract CryptoMonopoly {
         coin = CoinToken(tokenAddress);
 
         uint256 count = 1;
-        for (uint256 id = 0; id < 20; id++) {
-            grid.push(Box(id, "empty", address(0), 0, count * 5 * 10 ** 18));
-            count += 1;
+        for (uint256 id = 0; id < 21; id++) {
+            if (id == 5) grid.push(Box(id, "Passing", address(0), 0, 0));
+            else if (id == 10) grid.push(Box(id, "Free Parking", address(0), 0, 0));
+            else if (id == 15) grid.push(Box(id, "Go to Jail", address(0), 0, 0));
+            else if (id == 20) grid.push(Box(id, "Jail", address(0), 0, 0));
+            else {
+                grid.push(Box(id, "Building", address(0), 0, count * 5 * 10 ** 18));
+                count += 1;
+            }
         }
     }
 
@@ -44,6 +50,7 @@ contract CryptoMonopoly {
     }
 
     function movePlayer() public {
+        require(player[msg.sender] != 20);
         grid[player[msg.sender]].numberOfPlayers -= 1;
 
         uint256 randomNumber = uint256(keccak256(abi.encode(block.timestamp, msg.sender))) % 5;
@@ -52,6 +59,10 @@ contract CryptoMonopoly {
         if (player[msg.sender] >= 20) {
             player[msg.sender] = 0;
             grid[0].numberOfPlayers += 1;
+        }
+        if (player[msg.sender] == 15) {
+            player[msg.sender] = 20;
+            grid[20].numberOfPlayers += 1;
         }
         else {
             grid[player[msg.sender]].numberOfPlayers += 1;
@@ -66,9 +77,17 @@ contract CryptoMonopoly {
         require(coin.balanceOf(msg.sender) >= currentSpot.price);
 
         coin.burn(msg.sender, currentSpot.price);
-        grid[player[msg.sender]].owner = msg.sender;
+        player[msg.sender] = 5;
+        grid[20].numberOfPlayers -= 1;
+        grid[5].numberOfPlayers += 1;
     }
 
+    function leaveJail() public {
+        require(coin.balanceOf(msg.sender) >= 20);
+
+        coin.burn(msg.sender, 20);
+        player[msg.sender] = 5;
+    }
 
     modifier isOwner() {
         require(msg.sender == owner, "Not the Owner");
