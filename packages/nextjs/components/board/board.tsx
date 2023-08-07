@@ -15,13 +15,25 @@ export const Board = () => {
     args: [address],
   });
 
+  const { data: isPaid } = useScaffoldContractRead({
+    contractName: "CryptoMonopoly",
+    functionName: "isPaid",
+    args: [address],
+  });
+
+  const { data: isJail } = useScaffoldContractRead({
+    contractName: "CryptoMonopoly",
+    functionName: "isJail",
+    args: [address],
+  });
+
   const { data: coinBalance } = useScaffoldContractRead({
     contractName: "CoinToken",
     functionName: "balanceOf",
     args: [address],
   });
 
-  const { writeAsync: playGame } = useScaffoldContractWrite({
+  const { writeAsync: playGame, isLoading: playLoading } = useScaffoldContractWrite({
     contractName: "CryptoMonopoly",
     functionName: "addPlayer",
     onBlockConfirmation: txnReceipt => {
@@ -29,7 +41,7 @@ export const Board = () => {
     },
   });
 
-  const { writeAsync: roll } = useScaffoldContractWrite({
+  const { writeAsync: roll, isLoading: rollLoading } = useScaffoldContractWrite({
     contractName: "CryptoMonopoly",
     functionName: "movePlayer",
     onBlockConfirmation: txnReceipt => {
@@ -45,7 +57,7 @@ export const Board = () => {
     },
   });
 
-  const { writeAsync: leaveJail } = useScaffoldContractWrite({
+  const { writeAsync: leaveJail, isLoading: leaveLoading } = useScaffoldContractWrite({
     contractName: "CryptoMonopoly",
     functionName: "leaveJail",
     onBlockConfirmation: txnReceipt => {
@@ -64,30 +76,41 @@ export const Board = () => {
             </div>
             <div className="relative mt-3" style={{ width: "500px", height: "600px" }}>
               <div className="grid-action">
-                <button
-                  className="py-2 px-16 mb-1 mt-3 mr-3 bg-green-500 rounded baseline hover:bg-green-300 disabled:opacity-50"
-                  onClick={() => playGame()}
-                >
-                  Play
-                </button>
-                <button
-                  className="py-2 px-16 mb-1 mt-3 mr-3 bg-green-500 rounded baseline hover:bg-green-300 disabled:opacity-50"
-                  onClick={() => roll()}
-                >
-                  Roll
-                </button>
-                <button
-                  className="py-2 px-16 mb-1 mt-3 mr-3 bg-green-500 rounded baseline hover:bg-green-300 disabled:opacity-50"
-                  onClick={() => buyProperty()}
-                >
-                  Buy Property
-                </button>
-                <button
-                  className="py-2 px-16 mb-1 mt-3 mr-3 bg-green-500 rounded baseline hover:bg-green-300 disabled:opacity-50"
-                  onClick={() => leaveJail()}
-                >
-                  Leave Jail
-                </button>
+                {!isPaid && (
+                  <button
+                    className="py-2 px-16 mb-1 mt-3 mr-3 bg-green-500 rounded baseline hover:bg-green-300 disabled:opacity-50"
+                    onClick={() => playGame()}
+                    disabled={playLoading}
+                  >
+                    {playLoading ? "Adding..." : "Play"}
+                  </button>
+                )}
+                {isPaid && !isJail && (
+                  <button
+                    className="py-2 px-16 mb-1 mt-3 mr-3 bg-green-500 rounded baseline hover:bg-green-300 disabled:opacity-50"
+                    onClick={() => roll()}
+                    disabled={rollLoading}
+                  >
+                    {rollLoading ? "Rolling..." : "Roll"}
+                  </button>
+                )}
+                {isPaid && (
+                  <button
+                    className="py-2 px-16 mb-1 mt-3 mr-3 bg-green-500 rounded baseline hover:bg-green-300 disabled:opacity-50"
+                    onClick={() => buyProperty()}
+                  >
+                    Buy Property
+                  </button>
+                )}
+                {isJail && (
+                  <button
+                    className="py-2 px-16 mb-1 mt-3 mr-3 bg-green-500 rounded baseline hover:bg-green-300 disabled:opacity-50"
+                    onClick={() => leaveJail()}
+                    disabled={leaveLoading}
+                  >
+                    {leaveLoading ? "Escaping" : "Leave Jail"}
+                  </button>
+                )}
               </div>
               {gridData &&
                 gridData.map((item, index) => (

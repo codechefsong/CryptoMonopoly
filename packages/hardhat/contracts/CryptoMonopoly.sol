@@ -9,6 +9,8 @@ contract CryptoMonopoly {
     // State Variables
     address public immutable owner;
     Box[] public grid;
+    mapping(address => bool) public isPaid;
+    mapping(address => bool) public isJail;
     mapping(address => uint256) public player;
 
     struct Box {
@@ -47,13 +49,15 @@ contract CryptoMonopoly {
     function addPlayer() public {
         grid[0].numberOfPlayers += 1;
         coin.mint(msg.sender, 100 * 10 ** 18);
+        isPaid[msg.sender] = true;
     }
 
     function movePlayer() public {
-        require(player[msg.sender] != 20);
+        require(player[msg.sender] != 20, "You need to get out of jail to move");
         grid[player[msg.sender]].numberOfPlayers -= 1;
 
         uint256 randomNumber = uint256(keccak256(abi.encode(block.timestamp, msg.sender))) % 5;
+        // uint256 randomNumber = 4;
         player[msg.sender] += randomNumber + 1;
 
         if (player[msg.sender] >= 20) {
@@ -63,6 +67,7 @@ contract CryptoMonopoly {
         if (player[msg.sender] == 15) {
             player[msg.sender] = 20;
             grid[20].numberOfPlayers += 1;
+            isJail[msg.sender] = true;
         }
         else {
             grid[player[msg.sender]].numberOfPlayers += 1;
@@ -74,20 +79,22 @@ contract CryptoMonopoly {
     function buyProperty() public {
         Box memory currentSpot = grid[player[msg.sender]];
         
-        require(coin.balanceOf(msg.sender) >= currentSpot.price);
+        require(coin.balanceOf(msg.sender) >= currentSpot.price, "Not enough money");
 
         coin.burn(msg.sender, currentSpot.price);
+    }
+
+    function leaveJail() public {
+        require(coin.balanceOf(msg.sender) >= 20, "Not enough money");
+
+        coin.burn(msg.sender, 20);
         player[msg.sender] = 5;
+        isJail[msg.sender] = false;
         grid[20].numberOfPlayers -= 1;
         grid[5].numberOfPlayers += 1;
     }
 
-    function leaveJail() public {
-        require(coin.balanceOf(msg.sender) >= 20);
 
-        coin.burn(msg.sender, 20);
-        player[msg.sender] = 5;
-    }
 
     modifier isOwner() {
         require(msg.sender == owner, "Not the Owner");
