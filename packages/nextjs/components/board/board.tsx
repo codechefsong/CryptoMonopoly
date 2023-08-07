@@ -27,6 +27,12 @@ export const Board = () => {
     args: [address],
   });
 
+  const { data: isChestChance } = useScaffoldContractRead({
+    contractName: "CryptoMonopoly",
+    functionName: "isChestChance",
+    args: [address],
+  });
+
   const { data: coinBalance } = useScaffoldContractRead({
     contractName: "CoinToken",
     functionName: "balanceOf",
@@ -65,6 +71,14 @@ export const Board = () => {
     },
   });
 
+  const { writeAsync: collectChest, isLoading: collectChestLoading } = useScaffoldContractWrite({
+    contractName: "CryptoMonopoly",
+    functionName: "collectChest",
+    onBlockConfirmation: txnReceipt => {
+      console.log("📦 Transaction blockHash", txnReceipt.blockHash);
+    },
+  });
+
   return (
     <div className="mt-5">
       <div>
@@ -85,7 +99,7 @@ export const Board = () => {
                     {playLoading ? "Adding..." : "Play"}
                   </button>
                 )}
-                {isPaid && !isJail && (
+                {isPaid && !isJail && !isChestChance && (
                   <button
                     className="py-2 px-16 mb-1 mt-3 mr-3 bg-green-500 rounded baseline hover:bg-green-300 disabled:opacity-50"
                     onClick={() => roll()}
@@ -109,6 +123,15 @@ export const Board = () => {
                     disabled={leaveLoading}
                   >
                     {leaveLoading ? "Escaping" : "Leave Jail"}
+                  </button>
+                )}
+                {isChestChance && (
+                  <button
+                    className="py-2 px-16 mb-1 mt-3 mr-3 bg-green-500 rounded baseline hover:bg-green-300 disabled:opacity-50"
+                    onClick={() => collectChest()}
+                    disabled={collectChestLoading}
+                  >
+                    {collectChestLoading ? "Collecting" : "Collect Chest"}
                   </button>
                 )}
               </div>
