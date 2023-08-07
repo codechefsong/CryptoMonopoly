@@ -108,14 +108,16 @@ export const Board = () => {
                     {rollLoading ? "Rolling..." : "Roll"}
                   </button>
                 )}
-                {isPaid && (
-                  <button
-                    className="py-2 px-16 mb-1 mt-3 mr-3 bg-green-500 rounded baseline hover:bg-green-300 disabled:opacity-50"
-                    onClick={() => buyProperty()}
-                  >
-                    Buy Property
-                  </button>
-                )}
+                {gridData &&
+                  gridData[you?.toString() as any]?.owner === "0x0000000000000000000000000000000000000000" &&
+                  gridData[you?.toString() as any]?.typeGrid === "Building" && (
+                    <button
+                      className="py-2 px-16 mb-1 mt-3 mr-3 bg-green-500 rounded baseline hover:bg-green-300 disabled:opacity-50"
+                      onClick={() => buyProperty()}
+                    >
+                      Buy Property
+                    </button>
+                  )}
                 {isJail && (
                   <button
                     className="py-2 px-16 mb-1 mt-3 mr-3 bg-green-500 rounded baseline hover:bg-green-300 disabled:opacity-50"

@@ -91,6 +91,7 @@ contract CryptoMonopoly {
         require(coin.balanceOf(msg.sender) >= currentSpot.price, "Not enough money");
 
         coin.burn(msg.sender, currentSpot.price);
+        grid[player[msg.sender]].owner = msg.sender;
     }
 
     function leaveJail() public {
