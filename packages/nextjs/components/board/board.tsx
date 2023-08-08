@@ -1,9 +1,28 @@
+import { useState } from "react";
 import { BOARD_STYLES } from "./style";
 import { useAccount } from "wagmi";
-import { useScaffoldContractRead, useScaffoldContractWrite } from "~~/hooks/scaffold-eth";
+import { useScaffoldContractRead, useScaffoldContractWrite, useScaffoldEventSubscriber } from "~~/hooks/scaffold-eth";
+
+interface Log {
+  player: string;
+  detail: string;
+  num: number;
+}
 
 export const Board = () => {
   const { address } = useAccount();
+
+  const [logs, setLogs] = useState<any>([]);
+
+  useScaffoldEventSubscriber({
+    contractName: "CryptoMonopoly",
+    eventName: "PlayEvent",
+    listener: (data: any) => {
+      console.log(logs);
+      setLogs([data[0].args, ...logs]);
+    },
+  });
+
   const { data: gridData } = useScaffoldContractRead({
     contractName: "CryptoMonopoly",
     functionName: "getGrid",
@@ -159,6 +178,13 @@ export const Board = () => {
                     {playChanceLoading ? "Playing" : "Play Chance"}
                   </button>
                 )}
+                <div>
+                  {logs.map((log: Log, index: any) => (
+                    <p key={index}>
+                      {log.player.slice(0, 3)}...{log.player.slice(37, 42)} {log.detail} {log.num.toString()}
+                    </p>
+                  ))}
+                </div>
               </div>
               {gridData &&
                 gridData.map((item, index) => (

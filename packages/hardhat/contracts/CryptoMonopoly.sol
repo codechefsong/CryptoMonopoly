@@ -24,6 +24,7 @@ contract CryptoMonopoly {
     }
 
     event RollResult(address player, uint256 num);
+    event PlayEvent(address player, string detail, uint256 num);
 
     // Constructor: Called once on contract deployment
     // Check packages/hardhat/deploy/00_deploy_your_contract.ts
@@ -56,6 +57,8 @@ contract CryptoMonopoly {
         grid[0].numberOfPlayers += 1;
         coin.mint(msg.sender, 1000 * 10 ** 18);
         isPaid[msg.sender] = true;
+
+        emit PlayEvent(msg.sender, "join the game", 0);
     }
 
     function movePlayer() public {
@@ -75,6 +78,7 @@ contract CryptoMonopoly {
             player[msg.sender] = 20;
             grid[20].numberOfPlayers += 1;
             isJail[msg.sender] = true;
+            emit PlayEvent(msg.sender, "went to jail", 0);
         }
         else {
             grid[player[msg.sender]].numberOfPlayers += 1;
@@ -97,6 +101,8 @@ contract CryptoMonopoly {
 
         coin.burn(msg.sender, currentSpot.price);
         grid[player[msg.sender]].owner = msg.sender;
+
+        emit PlayEvent(msg.sender, "brought property #", currentSpot.id);
     }
 
     function leaveJail() public {
@@ -107,6 +113,7 @@ contract CryptoMonopoly {
         isJail[msg.sender] = false;
         grid[20].numberOfPlayers -= 1;
         grid[5].numberOfPlayers += 1;
+         emit PlayEvent(msg.sender, "left jail", 0);
     }
 
     function collectChest() public {
@@ -116,6 +123,7 @@ contract CryptoMonopoly {
         uint256 randomNumber = uint256(keccak256(abi.encode(block.timestamp, msg.sender))) % 19;
         coin.mint(msg.sender, (randomNumber + 1) * 10 ** 18);
         isChest[msg.sender] = false;
+        emit PlayEvent(msg.sender, "won", randomNumber + 1);
     }
 
     function playChance() public {
@@ -125,8 +133,10 @@ contract CryptoMonopoly {
         uint256 randomNumber = uint256(keccak256(abi.encode(block.timestamp, msg.sender))) % 20;
         if (randomNumber > 10)  {
             coin.mint(msg.sender, 25 * 10 ** 18);
+            emit PlayEvent(msg.sender, "won", randomNumber + 1);
         } else {
             coin.burn(msg.sender, 25 * 10 ** 18);
+            emit PlayEvent(msg.sender, "lost", randomNumber + 1);
         }
        
         isChance[msg.sender] = false;
