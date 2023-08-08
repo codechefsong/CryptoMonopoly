@@ -27,9 +27,15 @@ export const Board = () => {
     args: [address],
   });
 
-  const { data: isChestChance } = useScaffoldContractRead({
+  const { data: isChest } = useScaffoldContractRead({
     contractName: "CryptoMonopoly",
-    functionName: "isChestChance",
+    functionName: "isChest",
+    args: [address],
+  });
+
+  const { data: isChance } = useScaffoldContractRead({
+    contractName: "CryptoMonopoly",
+    functionName: "isChance",
     args: [address],
   });
 
@@ -79,6 +85,14 @@ export const Board = () => {
     },
   });
 
+  const { writeAsync: playChance, isLoading: playChanceLoading } = useScaffoldContractWrite({
+    contractName: "CryptoMonopoly",
+    functionName: "playChance",
+    onBlockConfirmation: txnReceipt => {
+      console.log("📦 Transaction blockHash", txnReceipt.blockHash);
+    },
+  });
+
   return (
     <div className="mt-5">
       <div>
@@ -99,7 +113,7 @@ export const Board = () => {
                     {playLoading ? "Adding..." : "Play"}
                   </button>
                 )}
-                {isPaid && !isJail && !isChestChance && (
+                {isPaid && !isJail && !isChest && !isChance && (
                   <button
                     className="py-2 px-16 mb-1 mt-3 mr-3 bg-green-500 rounded baseline hover:bg-green-300 disabled:opacity-50"
                     onClick={() => roll()}
@@ -127,13 +141,22 @@ export const Board = () => {
                     {leaveLoading ? "Escaping" : "Leave Jail"}
                   </button>
                 )}
-                {isChestChance && (
+                {isChest && (
                   <button
                     className="py-2 px-16 mb-1 mt-3 mr-3 bg-green-500 rounded baseline hover:bg-green-300 disabled:opacity-50"
                     onClick={() => collectChest()}
                     disabled={collectChestLoading}
                   >
                     {collectChestLoading ? "Collecting" : "Collect Chest"}
+                  </button>
+                )}
+                {isChance && (
+                  <button
+                    className="py-2 px-16 mb-1 mt-3 mr-3 bg-green-500 rounded baseline hover:bg-green-300 disabled:opacity-50"
+                    onClick={() => playChance()}
+                    disabled={playChanceLoading}
+                  >
+                    {playChanceLoading ? "Playing" : "Play Chance"}
                   </button>
                 )}
               </div>

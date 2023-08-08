@@ -11,7 +11,8 @@ contract CryptoMonopoly {
     Box[] public grid;
     mapping(address => bool) public isPaid;
     mapping(address => bool) public isJail;
-    mapping(address => bool) public isChestChance;
+    mapping(address => bool) public isChest;
+    mapping(address => bool) public isChance;
     mapping(address => uint256) public player;
 
     struct Box {
@@ -36,6 +37,7 @@ contract CryptoMonopoly {
         for (uint256 id = 1; id < 21; id++) {
             if (id == 5) grid.push(Box(id, "Passing", address(0), 0, 0));
             else if (id == 3 || id == 13) grid.push(Box(id, "Chest", address(0), 0, 0));
+            else if (id == 8 || id == 18) grid.push(Box(id, "Chance", address(0), 0, 0));
             else if (id == 10) grid.push(Box(id, "Free Parking", address(0), 0, 0));
             else if (id == 15) grid.push(Box(id, "Go to Jail", address(0), 0, 0));
             else if (id == 20) grid.push(Box(id, "Jail", address(0), 0, 0));
@@ -79,7 +81,10 @@ contract CryptoMonopoly {
         }
 
         if (player[msg.sender] == 3 || player[msg.sender] == 13) {
-            isChestChance[msg.sender] = true;
+            isChest[msg.sender] = true;
+        }
+        else if (player[msg.sender] == 8 || player[msg.sender] == 18) {
+            isChance[msg.sender] = true;
         }
 
         emit RollResult(msg.sender, randomNumber);
@@ -106,11 +111,25 @@ contract CryptoMonopoly {
 
     function collectChest() public {
         require(player[msg.sender] == 3 || player[msg.sender] == 13, "You cannot collect your chest");
-        require(isChestChance[msg.sender], "You already collect your chest");
+        require(isChest[msg.sender], "You already collect your chest");
 
         uint256 randomNumber = uint256(keccak256(abi.encode(block.timestamp, msg.sender))) % 19;
         coin.mint(msg.sender, (randomNumber + 1) * 10 ** 18);
-        isChestChance[msg.sender] = false;
+        isChest[msg.sender] = false;
+    }
+
+    function playChance() public {
+        require(player[msg.sender] == 8 || player[msg.sender] == 18, "You cannot play chance");
+        require(isChance[msg.sender], "You already played chance");
+
+        uint256 randomNumber = uint256(keccak256(abi.encode(block.timestamp, msg.sender))) % 20;
+        if (randomNumber > 10)  {
+            coin.mint(msg.sender, 25 * 10 ** 18);
+        } else {
+            coin.burn(msg.sender, 25 * 10 ** 18);
+        }
+       
+        isChance[msg.sender] = false;
     }
 
     modifier isOwner() {
