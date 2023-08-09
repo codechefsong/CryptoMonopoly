@@ -46,6 +46,12 @@ export const Header = () => {
         </NavLink>
       </li>
       <li>
+        <NavLink href="/properties">
+          <SparklesIcon className="h-4 w-4" />
+          Properties
+        </NavLink>
+      </li>
+      <li>
         <NavLink href="/debug">
           <BugAntIcon className="h-4 w-4" />
           Debug Contracts

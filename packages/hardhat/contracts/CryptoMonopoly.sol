@@ -17,6 +17,7 @@ contract CryptoMonopoly {
     mapping(address => bool) public isChance;
     mapping(address => bool) public isOwnRent;
     mapping(address => uint256) public player;
+    mapping(address => uint256[]) public playerProperties;
 
     struct Box {
         uint256 id;
@@ -25,6 +26,7 @@ contract CryptoMonopoly {
         uint256 numberOfPlayers;
         uint256 price;
         uint256 rent;
+        uint256 level;
     }
 
     event RollResult(address player, uint256 num);
@@ -36,18 +38,18 @@ contract CryptoMonopoly {
         owner = _owner;
         coin = CoinToken(tokenAddress);
 
-        grid.push(Box(0, "Home", address(0), 0, 0, 0));
+        grid.push(Box(0, "Home", address(0), 0, 0, 0, 1));
 
         uint256 count = 0;
         for (uint256 id = 1; id < 21; id++) {
-            if (id == 5) grid.push(Box(id, "Passing", address(0), 0, 0, 0));
-            else if (id == 3 || id == 13) grid.push(Box(id, "Chest", address(0), 0, 0, 0));
-            else if (id == 8 || id == 18) grid.push(Box(id, "Chance", address(0), 0, 0, 0));
-            else if (id == 10) grid.push(Box(id, "Free Parking", address(0), 0, 0, 0));
-            else if (id == 15) grid.push(Box(id, "Go to Jail", address(0), 0, 0, 0));
-            else if (id == 20) grid.push(Box(id, "Jail", address(0), 0, 0, 0));
+            if (id == 5) grid.push(Box(id, "Passing", address(0), 0, 0, 0, 1));
+            else if (id == 3 || id == 13) grid.push(Box(id, "Chest", address(0), 0, 0, 0, 1));
+            else if (id == 8 || id == 18) grid.push(Box(id, "Chance", address(0), 0, 0, 0, 1));
+            else if (id == 10) grid.push(Box(id, "Free Parking", address(0), 0, 0, 0, 1));
+            else if (id == 15) grid.push(Box(id, "Go to Jail", address(0), 0, 0, 0, 1));
+            else if (id == 20) grid.push(Box(id, "Jail", address(0), 0, 0, 0, 1));
             else {
-                grid.push(Box(id, "Building", address(0), 0, prices[count] * 10 ** 18, rents[count] * 10 ** 18));
+                grid.push(Box(id, "Building", address(0), 0, prices[count] * 10 ** 18, rents[count] * 10 ** 18, 1));
                 count += 1;
             }
         }
@@ -55,6 +57,10 @@ contract CryptoMonopoly {
 
     function getGrid() public view returns (Box[] memory){
         return grid;
+    }
+
+    function getPlayerProperties(address playerAddress) public view returns (uint256[] memory){
+        return playerProperties[playerAddress];
     }
 
     function addPlayer() public {
@@ -110,6 +116,7 @@ contract CryptoMonopoly {
 
         coin.burn(msg.sender, currentSpot.price);
         grid[player[msg.sender]].owner = msg.sender;
+        playerProperties[msg.sender].push(currentSpot.id);
 
         emit PlayEvent(msg.sender, "brought property #", currentSpot.id);
     }
