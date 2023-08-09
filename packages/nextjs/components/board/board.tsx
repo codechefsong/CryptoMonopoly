@@ -18,7 +18,6 @@ export const Board = () => {
     contractName: "CryptoMonopoly",
     eventName: "PlayEvent",
     listener: (data: any) => {
-      console.log(logs);
       setLogs([data[0].args, ...logs]);
     },
   });
@@ -55,6 +54,12 @@ export const Board = () => {
   const { data: isChance } = useScaffoldContractRead({
     contractName: "CryptoMonopoly",
     functionName: "isChance",
+    args: [address],
+  });
+
+  const { data: isOwnRent } = useScaffoldContractRead({
+    contractName: "CryptoMonopoly",
+    functionName: "isOwnRent",
     args: [address],
   });
 
@@ -112,6 +117,14 @@ export const Board = () => {
     },
   });
 
+  const { writeAsync: payRent, isLoading: payRentLoading } = useScaffoldContractWrite({
+    contractName: "CryptoMonopoly",
+    functionName: "payRent",
+    onBlockConfirmation: txnReceipt => {
+      console.log("📦 Transaction blockHash", txnReceipt.blockHash);
+    },
+  });
+
   return (
     <div className="mt-5">
       <div>
@@ -132,7 +145,7 @@ export const Board = () => {
                     {playLoading ? "Adding..." : "Play"}
                   </button>
                 )}
-                {isPaid && !isJail && !isChest && !isChance && (
+                {isPaid && !isJail && !isChest && !isChance && !isOwnRent && (
                   <button
                     className="py-2 px-16 mb-1 mt-3 mr-3 bg-green-500 rounded baseline hover:bg-green-300 disabled:opacity-50"
                     onClick={() => roll()}
@@ -166,7 +179,7 @@ export const Board = () => {
                     onClick={() => collectChest()}
                     disabled={collectChestLoading}
                   >
-                    {collectChestLoading ? "Collecting" : "Collect Chest"}
+                    {collectChestLoading ? "Collecting.." : "Collect Chest"}
                   </button>
                 )}
                 {isChance && (
@@ -175,7 +188,16 @@ export const Board = () => {
                     onClick={() => playChance()}
                     disabled={playChanceLoading}
                   >
-                    {playChanceLoading ? "Playing" : "Play Chance"}
+                    {playChanceLoading ? "Playing..." : "Play Chance"}
+                  </button>
+                )}
+                {isOwnRent && (
+                  <button
+                    className="py-2 px-16 mb-1 mt-3 mr-3 bg-green-500 rounded baseline hover:bg-green-300 disabled:opacity-50"
+                    onClick={() => payRent()}
+                    disabled={payRentLoading}
+                  >
+                    {payRentLoading ? "Paying..." : "Pay Rent"}
                   </button>
                 )}
                 <div>
@@ -199,7 +221,7 @@ export const Board = () => {
                       {item.numberOfPlayers > 0 && <p className="mr-1"># {item.numberOfPlayers.toString()} | </p>}
                       <p>
                         {item.owner !== "0x0000000000000000000000000000000000000000"
-                          ? "H"
+                          ? "H " + (item.rent?.toString() as any) / 10 ** 18
                           : item.typeGrid === "Building"
                           ? (item?.price?.toString() as any) / 10 ** 18
                           : item.typeGrid}

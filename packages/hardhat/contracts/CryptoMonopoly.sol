@@ -13,6 +13,7 @@ contract CryptoMonopoly {
     mapping(address => bool) public isJail;
     mapping(address => bool) public isChest;
     mapping(address => bool) public isChance;
+    mapping(address => bool) public isOwnRent;
     mapping(address => uint256) public player;
 
     struct Box {
@@ -21,6 +22,7 @@ contract CryptoMonopoly {
         address owner;
         uint256 numberOfPlayers;
         uint256 price;
+        uint256 rent;
     }
 
     event RollResult(address player, uint256 num);
@@ -32,18 +34,18 @@ contract CryptoMonopoly {
         owner = _owner;
         coin = CoinToken(tokenAddress);
 
-        grid.push(Box(0, "Home", address(0), 0, 0));
+        grid.push(Box(0, "Home", address(0), 0, 0, 0));
 
         uint256 count = 1;
         for (uint256 id = 1; id < 21; id++) {
-            if (id == 5) grid.push(Box(id, "Passing", address(0), 0, 0));
-            else if (id == 3 || id == 13) grid.push(Box(id, "Chest", address(0), 0, 0));
-            else if (id == 8 || id == 18) grid.push(Box(id, "Chance", address(0), 0, 0));
-            else if (id == 10) grid.push(Box(id, "Free Parking", address(0), 0, 0));
-            else if (id == 15) grid.push(Box(id, "Go to Jail", address(0), 0, 0));
-            else if (id == 20) grid.push(Box(id, "Jail", address(0), 0, 0));
+            if (id == 5) grid.push(Box(id, "Passing", address(0), 0, 0, 0));
+            else if (id == 3 || id == 13) grid.push(Box(id, "Chest", address(0), 0, 0, 0));
+            else if (id == 8 || id == 18) grid.push(Box(id, "Chance", address(0), 0, 0, 0));
+            else if (id == 10) grid.push(Box(id, "Free Parking", address(0), 0, 0, 0));
+            else if (id == 15) grid.push(Box(id, "Go to Jail", address(0), 0, 0, 0));
+            else if (id == 20) grid.push(Box(id, "Jail", address(0), 0, 0, 0));
             else {
-                grid.push(Box(id, "Building", address(0), 0, count * 10 * 10 ** 18));
+                grid.push(Box(id, "Building", address(0), 0, count * 10 * 10 ** 18, count * 2 * 10 ** 18));
                 count += 1;
             }
         }
@@ -63,7 +65,8 @@ contract CryptoMonopoly {
 
     function movePlayer() public {
         require(player[msg.sender] != 20, "You need to get out of jail to move");
-        require(player[msg.sender] != 3 || player[msg.sender] != 13, "You need to collect your chest");
+        require(player[msg.sender] != 20, "You need to get out of jail to move");
+        require(!isOwnRent[msg.sender], "You need pay your rent");
         grid[player[msg.sender]].numberOfPlayers -= 1;
 
         uint256 randomNumber = uint256(keccak256(abi.encode(block.timestamp, msg.sender))) % 5;
@@ -91,6 +94,10 @@ contract CryptoMonopoly {
             isChance[msg.sender] = true;
         }
 
+        if (grid[player[msg.sender]].owner != address(0) && grid[player[msg.sender]].owner != msg.sender) {
+            isOwnRent[msg.sender] = true;
+        }
+
         emit RollResult(msg.sender, randomNumber);
     }
 
@@ -113,7 +120,7 @@ contract CryptoMonopoly {
         isJail[msg.sender] = false;
         grid[20].numberOfPlayers -= 1;
         grid[5].numberOfPlayers += 1;
-         emit PlayEvent(msg.sender, "left jail", 0);
+        emit PlayEvent(msg.sender, "left jail", 0);
     }
 
     function collectChest() public {
@@ -140,6 +147,15 @@ contract CryptoMonopoly {
         }
        
         isChance[msg.sender] = false;
+    }
+
+     function payRent() public {
+        Box memory currentSpot = grid[player[msg.sender]];
+        require(coin.balanceOf(msg.sender) >= currentSpot.rent, "Not enough money");
+
+        coin.burn(msg.sender, currentSpot.rent);
+        coin.mint(currentSpot.owner, currentSpot.rent);
+        isOwnRent[msg.sender] = false;
     }
 
     modifier isOwner() {
