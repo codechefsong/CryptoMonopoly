@@ -9,6 +9,8 @@ contract CryptoMonopoly {
     // State Variables
     address public immutable owner;
     Box[] public grid;
+    uint256[] prices = [20, 25, 30, 80, 85, 90, 150, 160, 170, 300, 310, 325];
+    uint256[] rents = [3, 5, 7, 15, 17, 20, 40, 45, 50, 65, 70, 75];
     mapping(address => bool) public isPaid;
     mapping(address => bool) public isJail;
     mapping(address => bool) public isChest;
@@ -36,7 +38,7 @@ contract CryptoMonopoly {
 
         grid.push(Box(0, "Home", address(0), 0, 0, 0));
 
-        uint256 count = 1;
+        uint256 count = 0;
         for (uint256 id = 1; id < 21; id++) {
             if (id == 5) grid.push(Box(id, "Passing", address(0), 0, 0, 0));
             else if (id == 3 || id == 13) grid.push(Box(id, "Chest", address(0), 0, 0, 0));
@@ -45,7 +47,7 @@ contract CryptoMonopoly {
             else if (id == 15) grid.push(Box(id, "Go to Jail", address(0), 0, 0, 0));
             else if (id == 20) grid.push(Box(id, "Jail", address(0), 0, 0, 0));
             else {
-                grid.push(Box(id, "Building", address(0), 0, count * 10 * 10 ** 18, count * 2 * 10 ** 18));
+                grid.push(Box(id, "Building", address(0), 0, prices[count] * 10 ** 18, rents[count] * 10 ** 18));
                 count += 1;
             }
         }
