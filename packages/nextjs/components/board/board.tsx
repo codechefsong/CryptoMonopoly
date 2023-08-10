@@ -213,13 +213,20 @@ export const Board = () => {
                   <div
                     key={index}
                     className={
-                      "w-20 h-20 border border-gray-300 font-bold bg-white" + " " + BOARD_STYLES[index] || "grid-1"
+                      "relative w-20 h-20 border border-gray-300 font-bold bg-white" + " " + BOARD_STYLES[index] || "grid-1"
                     }
                   >
-                    {you?.toString() === item.id.toString() && <p className="my-0">You</p>}
+                    {you?.toString() === item.id.toString() && <img className="car z-30" src="/assets/car.png" alt="Car" />}
+                    {item.typeGrid === "Home" && <img className="home" src="/assets/go.png" alt="Home" />}
+                    {item.typeGrid === "Chest" && <img className="car" src="/assets/chest.png" alt="Chest" />}
+                    {item.typeGrid === "Passing" && <img className="passing" src="/assets/visiting.png" alt="Visiting" />}
+                    {item.typeGrid === "Chance" && <img className="car" src="/assets/chance.png" alt="Chance" />}
+                    {item.typeGrid === "Jail" && <img className="car" src="/assets/jail.png" alt="Jail" />}
+                    {item.typeGrid === "Free Parking" && <img className="car" src="/assets/freeparking.png" alt="Free Parking" />}
+                    {item.typeGrid === "Go to Jail" && <img className="car" src="/assets/police.png" alt="Police" />}
+                    {item.numberOfPlayers > 0 && <p className="mr-1"># {item.numberOfPlayers.toString()} | </p>}
                     <div className="flex my-0">
-                      {item.numberOfPlayers > 0 && <p className="mr-1"># {item.numberOfPlayers.toString()} | </p>}
-                      <p>
+                      <p className="price">
                         {item.owner !== "0x0000000000000000000000000000000000000000"
                           ? "H " + (item.rent?.toString() as any) / 10 ** 18
                           : item.typeGrid === "Building"
