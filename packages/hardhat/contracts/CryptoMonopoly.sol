@@ -29,7 +29,7 @@ contract CryptoMonopoly {
         uint256 level;
     }
 
-    event RollResult(address player, uint256 num);
+    event RollResult(address player, string detail, uint256 num);
     event PlayEvent(address player, string detail, uint256 num);
 
     // Constructor: Called once on contract deployment
@@ -65,7 +65,7 @@ contract CryptoMonopoly {
 
     function addPlayer() public {
         grid[0].numberOfPlayers += 1;
-        coin.mint(msg.sender, 1000 * 10 ** 18);
+        coin.mint(msg.sender, 500 * 10 ** 18);
         isPaid[msg.sender] = true;
 
         emit PlayEvent(msg.sender, "join the game", 0);
@@ -84,6 +84,8 @@ contract CryptoMonopoly {
         if (player[msg.sender] >= 20) {
             player[msg.sender] = 0;
             grid[0].numberOfPlayers += 1;
+            coin.mint(msg.sender, 200 * 10 ** 18);
+             emit PlayEvent(msg.sender, "earn", 200);
         }
         else if (player[msg.sender] == 15) {
             player[msg.sender] = 20;
@@ -106,7 +108,7 @@ contract CryptoMonopoly {
             isOwnRent[msg.sender] = true;
         }
 
-        emit RollResult(msg.sender, randomNumber);
+        emit RollResult(msg.sender, "roll", randomNumber + 1);
     }
 
     function buyProperty() public {

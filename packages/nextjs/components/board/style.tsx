@@ -21,3 +21,27 @@ export const BOARD_STYLES = [
   "grid-20",
   "grid-21",
 ];
+
+export const BOARD_COLORS = [
+  "bg-sky-300",
+  "bg-sky-300",
+  "bg-sky-300",
+  "bg-sky-300",
+  "bg-sky-300",
+  "bg-sky-300",
+  "bg-orange-400",
+  "bg-orange-400",
+  "bg-orange-400",
+  "bg-orange-400",
+  "bg-orange-400",
+  "bg-yellow-400",
+  "bg-yellow-400",
+  "bg-yellow-400",
+  "bg-yellow-400",
+  "bg-yellow-400",
+  "bg-green-400",
+  "bg-green-400",
+  "bg-green-400",
+  "bg-green-400",
+  "bg-green-400",
+];

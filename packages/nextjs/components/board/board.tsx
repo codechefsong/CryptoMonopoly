@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { BOARD_STYLES } from "./style";
+import Image from "next/image";
+import { BOARD_COLORS, BOARD_STYLES } from "./style";
 import { useAccount } from "wagmi";
 import { useScaffoldContractRead, useScaffoldContractWrite, useScaffoldEventSubscriber } from "~~/hooks/scaffold-eth";
 
@@ -18,6 +19,15 @@ export const Board = () => {
     contractName: "CryptoMonopoly",
     eventName: "PlayEvent",
     listener: (data: any) => {
+      setLogs([data[0].args, ...logs]);
+    },
+  });
+
+  useScaffoldEventSubscriber({
+    contractName: "CryptoMonopoly",
+    eventName: "RollResult",
+    listener: (data: any) => {
+      data[0].detail = "roll";
       setLogs([data[0].args, ...logs]);
     },
   });
@@ -213,27 +223,39 @@ export const Board = () => {
                   <div
                     key={index}
                     className={
-                      "relative w-20 h-20 border border-gray-300 font-bold bg-white" + " " + BOARD_STYLES[index] || "grid-1"
+                      "relative w-20 h-20 border border-gray-300 font-bold bg-white" + " " + BOARD_STYLES[index] ||
+                      "grid-1"
                     }
                   >
-                    {you?.toString() === item.id.toString() && <img className="car z-30" src="/assets/car.png" alt="Car" />}
-                    {item.typeGrid === "Home" && <img className="home" src="/assets/go.png" alt="Home" />}
-                    {item.typeGrid === "Chest" && <img className="car" src="/assets/chest.png" alt="Chest" />}
-                    {item.typeGrid === "Passing" && <img className="passing" src="/assets/visiting.png" alt="Visiting" />}
-                    {item.typeGrid === "Chance" && <img className="car" src="/assets/chance.png" alt="Chance" />}
-                    {item.typeGrid === "Jail" && <img className="car" src="/assets/jail.png" alt="Jail" />}
-                    {item.typeGrid === "Free Parking" && <img className="car" src="/assets/freeparking.png" alt="Free Parking" />}
-                    {item.typeGrid === "Go to Jail" && <img className="car" src="/assets/police.png" alt="Police" />}
-                    {item.numberOfPlayers > 0 && <p className="mr-1"># {item.numberOfPlayers.toString()} | </p>}
-                    <div className="flex my-0">
-                      <p className="price">
-                        {item.owner !== "0x0000000000000000000000000000000000000000"
-                          ? "H " + (item.rent?.toString() as any) / 10 ** 18
-                          : item.typeGrid === "Building"
-                          ? (item?.price?.toString() as any) / 10 ** 18
-                          : item.typeGrid}
-                      </p>
-                    </div>
+                    {item.typeGrid === "Building" && <div className={"label" + " " + BOARD_COLORS[index]}></div>}
+                    {you?.toString() === item.id.toString() && (
+                      <Image className="car z-30" src="/assets/car.png" alt="Car" />
+                    )}
+                    {item.typeGrid === "Home" && <Image className="home" src="/assets/go.png" alt="Home" />}
+                    {item.typeGrid === "Chest" && <Image className="car" src="/assets/chest.png" alt="Chest" />}
+                    {item.typeGrid === "Passing" && (
+                      <Image className="passing" src="/assets/visiting.png" alt="Visiting" />
+                    )}
+                    {item.typeGrid === "Chance" && <Image className="car" src="/assets/chance.png" alt="Chance" />}
+                    {item.typeGrid === "Jail" && <Image className="car" src="/assets/jail.png" alt="Jail" />}
+                    {item.typeGrid === "Free Parking" && (
+                      <Image className="car" src="/assets/freeparking.png" alt="Free Parking" />
+                    )}
+                    {item.typeGrid === "Go to Jail" && <Image className="car" src="/assets/police.png" alt="Police" />}
+                    {item.typeGrid === "Building" && <p className="building">Building # {index}</p>}
+                    {item.numberOfPlayers > 0 && (
+                      <div className="numberplayers">
+                        <p className="mr-1">{item.numberOfPlayers.toString()}</p>
+                        <Image className="w-5 h-4" src="/assets/head.png" alt="Players" />
+                      </div>
+                    )}
+                    <p className="price ml-3">
+                      {item.owner !== "0x0000000000000000000000000000000000000000"
+                        ? "Rent for " + (item.rent?.toString() as any) / 10 ** 18
+                        : item.typeGrid === "Building"
+                        ? "Buy for " + (item?.price?.toString() as any) / 10 ** 18
+                        : item.typeGrid}
+                    </p>
                   </div>
                 ))}
             </div>
