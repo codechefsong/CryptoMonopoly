@@ -229,24 +229,34 @@ export const Board = () => {
                   >
                     {item.typeGrid === "Building" && <div className={"label" + " " + BOARD_COLORS[index]}></div>}
                     {you?.toString() === item.id.toString() && (
-                      <Image className="car z-30" src="/assets/car.png" alt="Car" />
+                      <Image className="car z-30" width={30} height={30} src="/assets/car.png" alt="Car" />
                     )}
-                    {item.typeGrid === "Home" && <Image className="home" src="/assets/go.png" alt="Home" />}
-                    {item.typeGrid === "Chest" && <Image className="car" src="/assets/chest.png" alt="Chest" />}
+                    {item.typeGrid === "Home" && (
+                      <Image className="home" width={45} height={45} src="/assets/go.png" alt="Home" />
+                    )}
+                    {item.typeGrid === "Chest" && (
+                      <Image className="car" src="/assets/chest.png" width={45} height={45} alt="Chest" />
+                    )}
                     {item.typeGrid === "Passing" && (
-                      <Image className="passing" src="/assets/visiting.png" alt="Visiting" />
+                      <Image className="passing" width={45} height={45} src="/assets/visiting.png" alt="Visiting" />
                     )}
-                    {item.typeGrid === "Chance" && <Image className="car" src="/assets/chance.png" alt="Chance" />}
-                    {item.typeGrid === "Jail" && <Image className="car" src="/assets/jail.png" alt="Jail" />}
+                    {item.typeGrid === "Chance" && (
+                      <Image className="car" width={45} height={45} src="/assets/chance.png" alt="Chance" />
+                    )}
+                    {item.typeGrid === "Jail" && (
+                      <Image className="car" width={50} height={50} src="/assets/jail.png" alt="Jail" />
+                    )}
                     {item.typeGrid === "Free Parking" && (
-                      <Image className="car" src="/assets/freeparking.png" alt="Free Parking" />
+                      <Image className="car" width={45} height={45} src="/assets/freeparking.png" alt="Free Parking" />
                     )}
-                    {item.typeGrid === "Go to Jail" && <Image className="car" src="/assets/police.png" alt="Police" />}
+                    {item.typeGrid === "Go to Jail" && (
+                      <Image className="car" width={45} height={45} src="/assets/police.png" alt="Police" />
+                    )}
                     {item.typeGrid === "Building" && <p className="building">Building # {index}</p>}
                     {item.numberOfPlayers > 0 && (
                       <div className="numberplayers">
                         <p className="mr-1">{item.numberOfPlayers.toString()}</p>
-                        <Image className="w-5 h-4" src="/assets/head.png" alt="Players" />
+                        <Image className="w-5 h-4" width={45} height={45} src="/assets/head.png" alt="Players" />
                       </div>
                     )}
                     <p className="price ml-3">

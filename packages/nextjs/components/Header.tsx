@@ -93,7 +93,7 @@ export const Header = () => {
         </div>
         <Link href="/" passHref className="hidden lg:flex items-center gap-2 ml-4 mr-6">
           <div className="flex relative w-10 h-10">
-            <Image src="/assets/car.png" alt="Car" />
+            <Image src="/assets/car.png" width={45} height={45} alt="Car" />
           </div>
           <div className="flex flex-col">
             <span className="font-bold leading-tight">CryptoMonopoly</span>
